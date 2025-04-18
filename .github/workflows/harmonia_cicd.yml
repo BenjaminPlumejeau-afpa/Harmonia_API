@@ -17,18 +17,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: ${{ secrets.TEST_DB }}
-          MYSQL_USER: ${{ secrets.DB_USER }}
-          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        ports:
-          - 3306:3306
-
     steps:
+
     - name: Checkout repository
       uses: actions/checkout@v4
 
@@ -37,6 +27,12 @@ jobs:
       with:
         java-version: '21'
         distribution: 'zulu'
+
+    - name: Start MySql # demarrage du service mysql
+      run: sudo service mysql start
+
+    - name: Create Database from script
+      run: mysql -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} -e "source infra/mysql/dump/springboot.sql"
 
     - name: Cache SonarQube packages
       uses: actions/cache@v4
@@ -57,11 +53,8 @@ jobs:
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=noemie-dev_Harmonia_API_Fork
+      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=noemie-dev_Harmonia_API_Fork
 					
 
-		
-
     - name: Build and Test
-      
-      run: mvnw -B verify
+      run: mvn -B verify
