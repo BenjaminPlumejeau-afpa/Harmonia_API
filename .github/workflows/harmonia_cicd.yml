@@ -1,4 +1,4 @@
-name: SonarQube
+name: CICD Api
 on:
   push:
     branches:
