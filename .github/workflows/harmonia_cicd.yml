@@ -1,4 +1,4 @@
-name: CICD Api
+name: CICD Api 1
 on:
   push:
     branches:
